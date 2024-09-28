@@ -1,0 +1,22 @@
+CREATE OR REPLACE FUNCTION fn_list () 
+ RETURNS TABLE (
+ quantity INT,
+ consultdate TEXT
+) 
+AS $$
+DECLARE 
+    var_r record;
+BEGIN
+FOR var_r IN(
+	select (count(*)::int) as quantity, to_char(c.consult_date, 'dd/MM/yyyy') as consultdate from consult c 
+	group by to_char(c.consult_date, 'dd/MM/yyyy') order by to_char(c.consult_date, 'dd/MM/yyyy') asc 
+	)  
+ LOOP
+        quantity := var_r.quantity; 
+ 		consultdate := var_r.consultdate;
+        RETURN NEXT;
+ END LOOP;
+END; $$ 
+LANGUAGE 'plpgsql';
+
+select * from fn_list();
